@@ -1,31 +1,6 @@
 from pathlib import Path
 import json
 
-from overall import process_header_file
-
-
-def get_vocabulary(headers_file, recent_voc_file, update=False):
-    # 获取所学单词
-    import requests
-    import json
-    if recent_voc_file and not update:
-        print("using cached voc file")
-        with open(recent_voc_file, 'r') as file:
-            voc = json.load(file)
-        return voc
-    vocabulary_url = 'https://www.duolingo.com/vocabulary/overview'
-    headers = process_header_file(headers_file)
-    response = requests.get(vocabulary_url, headers=headers)
-    if response.status_code == 200:
-        voc_obj = json.loads(response.text)['vocab_overview']
-        with open("voc.json", 'w') as file:
-            json.dump(voc_obj, file, indent=4)
-        return voc_obj
-    else:
-        print(response.status_code)
-        return None
-
-
 def organize_words_by_pos(wordlist: list):
     '''
     将单词按词性组织
