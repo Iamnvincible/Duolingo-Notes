@@ -1,84 +1,131 @@
 from pathlib import Path
 import json
 
-def filter_skills_from_userinfo(userinfo: str):
-    file = Path(userinfo)
+
+def dump_current_skills(
+    userinfo_file: str = "user_info.json", skills_file: str = "skills.json"
+):
+    file = Path(userinfo_file)
     if file.exists():
-        with file.open(encoding='utf-8') as f:
+        with file.open("r", encoding="utf-8") as f:
             userinfo = json.load(f)
-        skills = userinfo['currentCourse']['skills']
-        with open("skills.json", "w") as f:
+        skills = userinfo["currentCourse"]["skills"]
+        with open(skills_file, "w") as f:
             json.dump(skills, f, indent=4)
+        return skills
+    return None
 
-def get_path(userinfo: str):
-    file = Path(userinfo)
+
+def dump_course_path(
+    userinfo_file: str = "user_info.json", paths_file: str = "path.json"
+):
+    file = Path(userinfo_file)
     if file.exists():
-        with file.open(encoding='utf-8') as f:
+        with file.open(encoding="utf-8") as f:
             userinfo = json.load(f)
-        path = userinfo['currentCourse']['path']
-        with open("path.json", "w") as f:
-            json.dump(path, f, indent=4)
+        course_path = userinfo["currentCourse"]["pathSectioned"]
+        with open(paths_file, "w") as f:
+            json.dump(course_path, f, indent=4)
+        return course_path
 
-def get_units(path: str):
-    file = Path(path)
+
+def get_units_legacy(course_path_file: str):
+    file = Path(course_path_file)
+    units_count = 0
     if file.exists():
         sub_teachingobjectives = []
-        save_dir = Path('units')
+        save_dir = Path("units")
         if not save_dir.exists():
             save_dir.mkdir()
         with file.open() as f:
             units = json.load(f)
         for unit in units:
             u = {}
-            u["index"] = unit['unitIndex'] + 1
-            u["guide"] = unit['guidebook']
-            u['theme'] = unit['teachingObjective']
-            u['cert'] = unit['cefrLevel']
-            u['levels'] = []
-            for level in unit['levels']:
-                if level['type'] == "skill" and level['pathLevelClientData']['skillId'] not in sub_teachingobjectives:
+            u["index"] = unit["unitIndex"] + 1
+            u["guide"] = unit["guidebook"]
+            u["theme"] = unit["teachingObjective"]
+            u["cert"] = unit["cefrLevel"]
+            u["levels"] = []
+            for level in unit["levels"]:
+                if (
+                    level["type"] == "skill"
+                    and level["pathLevelClientData"]["skillId"]
+                    not in sub_teachingobjectives
+                ):
                     sub_teachingobjectives.append(
-                        level['pathLevelClientData']['skillId'])
-                    u['levels'].append(level)
+                        level["pathLevelClientData"]["skillId"]
+                    )
+                    u["levels"].append(level)
             unit_path = Path(f'unit_{u["index"]}.json')
             unit_file = Path(save_dir, unit_path)
             with unit_file.open("w") as file:
                 json.dump(u, file, indent=4)
+            units_count += 1
+    return units_count
 
-def get_skills(skills: str):
-    file = Path(skills)
+
+def get_units(course_path_file: str="path.json"):
+    file = Path(course_path_file)
+    units_count = 0
     if file.exists():
         sub_teachingobjectives = []
-        save_dir = Path('skills')
+        save_dir = Path("units")
         if not save_dir.exists():
             save_dir.mkdir()
-        with file.open(encoding='utf-8') as f:
+        with file.open() as f:
+            sections = json.load(f)
+        for section in sections:
+            for unit in section['units']:
+                u = {}
+                u["index"] = unit["unitIndex"] + 1
+                u["guide"] = unit["guidebook"]
+                u["theme"] = unit["teachingObjective"]
+                u["cert"] = unit["cefrLevel"]
+                u["levels"] = []
+                for level in unit["levels"]:
+                    if (
+                        level["type"] == "skill"
+                        and level["pathLevelClientData"]["skillId"]
+                        not in sub_teachingobjectives
+                    ):
+                        sub_teachingobjectives.append(
+                            level["pathLevelClientData"]["skillId"]
+                        )
+                        u["levels"].append(level)
+                unit_path = Path(f'unit_{u["index"]}.json')
+                unit_file = Path(save_dir, unit_path)
+                with unit_file.open("w") as file:
+                    json.dump(u, file, indent=4)
+                units_count += 1
+    return units_count
+
+def get_skills(skills_file: str = "skills.json"):
+    file = Path(skills_file)
+    skills_count = 0
+    if file.exists():
+        save_dir = Path("skills")
+        if not save_dir.exists():
+            save_dir.mkdir()
+        with file.open(encoding="utf-8") as f:
             skill_list = json.load(f)
         for arr in skill_list:
             for item in arr:
-                skill_title = item['urlName']
-                skill_path = Path(f'{skill_title}.json')
+                skill_title = item["urlName"]
+                skill_path = Path(f"{skill_title}.json")
                 skill_file = Path(save_dir, skill_path)
                 with skill_file.open("w") as file:
                     json.dump(item, file, indent=4)
+                skills_count += 1
+    return skills_count
 
 
 if __name__ == "__main__":
-    header_file = "headers"
     userinfo_file = "user_info.json"
     path_file = "path.json"
     skills_file = "skills.json"
     user_info = Path(userinfo_file)
-    if user_info.exists():
-        skills = Path(skills_file)
-        path = Path(path_file)
-        if not skills.exists():
-            filter_skills_from_userinfo(userinfo_file)
-        get_skills(skills_file)
-        if not path.exists():
-            get_path(userinfo_file)
-    else:
-        headers = process_header_file(header_file)
-        user_fields(headers)
-    get_units(path_file)
-    #get_skills(skills_file)
+    # if user_info.exists():
+    #     dump_course_path(userinfo_file, path_file)
+    #     dump_current_skills(userinfo_file, skills_file)
+    #get_units(path_file)
+    #get_skills()
