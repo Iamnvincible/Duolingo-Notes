@@ -78,6 +78,7 @@ def get_units(course_path_file: str="path.json"):
             for unit in section['units']:
                 u = {}
                 u["index"] = unit["unitIndex"] + 1
+                u["section"] = section['index'] + 1
                 u["guide"] = unit["guidebook"]
                 u["theme"] = unit["teachingObjective"]
                 u["cert"] = unit["cefrLevel"]
@@ -127,5 +128,5 @@ if __name__ == "__main__":
     # if user_info.exists():
     #     dump_course_path(userinfo_file, path_file)
     #     dump_current_skills(userinfo_file, skills_file)
-    #get_units(path_file)
-    #get_skills()
+    get_units(path_file)
+    get_skills()
