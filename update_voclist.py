@@ -81,7 +81,9 @@ def get_unit_info(index: int, unit_path: Path, skill_path: Path, skill_voc_path:
         skill_name = level["debugName"].replace(" ", "-")
         if skill_name == "Dining-Out":
             skill_name = "DiningOut"
-        skill_file = Path(skill_path, f"{skill_name}.json")
+        for skill_one_file in skill_path.iterdir():
+            if skill_one_file.name.endswith(f"{skill_name}.json"):
+                skill_file = Path(skill_path,skill_one_file.name)
         word_file = Path(skill_voc_path, f"{skill_name}.json")
         skill_info = {}
         if not skill_file.exists():
@@ -198,7 +200,7 @@ if __name__ == "__main__":
     notes_dir = Path("tips_and_notes")
     if not skillvoc_dir.exists() or not any(skillvoc_dir.iterdir()):
         dump_words_of_skills("headers", skillvoc_dir, "voc.json", False)
-    write_unit_wordlist(voc_list_dir, 1, 26)
+    write_unit_wordlist(voc_list_dir, 1, 27)
     if skills_dir.exists():
         if not notes_dir.exists():
             notes_dir.mkdir()

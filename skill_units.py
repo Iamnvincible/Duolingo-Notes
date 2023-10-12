@@ -64,7 +64,7 @@ def get_units_legacy(course_path_file: str):
     return units_count
 
 
-def get_units(course_path_file: str="path.json"):
+def get_units(course_path_file: str = "path.json"):
     file = Path(course_path_file)
     units_count = 0
     if file.exists():
@@ -100,6 +100,7 @@ def get_units(course_path_file: str="path.json"):
                 units_count += 1
     return units_count
 
+
 def get_skills(skills_file: str = "skills.json"):
     file = Path(skills_file)
     skills_count = 0
@@ -112,7 +113,7 @@ def get_skills(skills_file: str = "skills.json"):
         for arr in skill_list:
             for item in arr:
                 skill_title = item["urlName"]
-                skill_path = Path(f"{skill_title}.json")
+                skill_path = Path(f"{skills_count + 1}-{skill_title}.json")
                 skill_file = Path(save_dir, skill_path)
                 with skill_file.open("w") as file:
                     json.dump(item, file, indent=4)
@@ -125,8 +126,8 @@ if __name__ == "__main__":
     path_file = "path.json"
     skills_file = "skills.json"
     user_info = Path(userinfo_file)
-    # if user_info.exists():
-    #     dump_course_path(userinfo_file, path_file)
-    #     dump_current_skills(userinfo_file, skills_file)
+    if user_info.exists():
+        dump_course_path(userinfo_file, path_file)
+        dump_current_skills(userinfo_file, skills_file)
     get_units(path_file)
     get_skills()
