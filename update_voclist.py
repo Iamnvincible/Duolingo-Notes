@@ -198,8 +198,8 @@ if __name__ == "__main__":
     skills_dir = Path("skills")
     voc_list_dir = Path("vocabulary_list")
     notes_dir = Path("tips_and_notes")
-    if not skillvoc_dir.exists() or not any(skillvoc_dir.iterdir()):
-        dump_words_of_skills("headers", skillvoc_dir, "voc.json", False)
+    # if not skillvoc_dir.exists() or not any(skillvoc_dir.iterdir()):
+    dump_words_of_skills("headers", skillvoc_dir, "voc.json", False)
     write_unit_wordlist(voc_list_dir, 1, 27)
     if skills_dir.exists():
         if not notes_dir.exists():
