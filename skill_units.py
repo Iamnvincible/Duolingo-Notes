@@ -83,6 +83,7 @@ def get_units(course_path_file: str = "path.json"):
                 u["theme"] = unit["teachingObjective"]
                 u["cert"] = unit["cefrLevel"]
                 u["levels"] = []
+                uniq_level_index = 1
                 for level in unit["levels"]:
                     if (
                         level["type"] == "skill"
@@ -92,7 +93,9 @@ def get_units(course_path_file: str = "path.json"):
                         sub_teachingobjectives.append(
                             level["pathLevelClientData"]["skillId"]
                         )
+                        level['level_index'] = uniq_level_index
                         u["levels"].append(level)
+                    uniq_level_index += 1
                 unit_path = Path(f'unit_{u["index"]}.json')
                 unit_file = Path(save_dir, unit_path)
                 with unit_file.open("w") as file:
@@ -120,6 +123,18 @@ def get_skills(skills_file: str = "skills.json"):
                 skills_count += 1
     return skills_count
 
+def unit_path(path_file:str):
+    path = Path(path_file)
+    if path.exists():
+        with path.open('r',encoding="utf-8") as f:
+            path_json = json.load(f)
+        for section in path_json:
+            for unit in section['units']:
+                unit_index = unit['unitIndex'] + 1
+                save_name = f'unit-{unit_index}-path.json'
+                save_file = Path(save_name)
+                with save_file.open('w',encoding='utf-8') as f:
+                    json.dump(unit,f,indent=4,ensure_ascii=False)
 
 if __name__ == "__main__":
     userinfo_file = "user_info.json"
@@ -131,3 +146,4 @@ if __name__ == "__main__":
         dump_current_skills(userinfo_file, skills_file)
     get_units(path_file)
     get_skills()
+    unit_path(path_file)
