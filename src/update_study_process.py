@@ -1,5 +1,6 @@
 from pathlib import Path
-import json, time
+import json
+import time
 import requests
 
 
@@ -33,8 +34,13 @@ def user_fields(req_headers: dict, user_info: Path):
 
 
 def get_vocabulary(headers: dict):
-    """
-    get all learned vocabulary
+    """download all learnt vocabulary
+
+    Args:
+        headers (dict): request http header
+
+    Returns:
+        dict: all vocabulary in a json object
     """
     vocabulary_url = "https://www.duolingo.com/vocabulary/overview"
     response = requests.get(vocabulary_url, headers=headers, timeout=10)
@@ -45,6 +51,14 @@ def get_vocabulary(headers: dict):
 
 
 def process_header_file(header_file_path: str):
+    """read a http header file and squeeze it into a dict
+
+    Args:
+        header_file_path (str): http head file path
+
+    Returns:
+        dict: http head in dict structure
+    """
     file = Path(header_file_path)
     if file.exists():
         with file.open() as f:
@@ -54,6 +68,7 @@ def process_header_file(header_file_path: str):
             attr, value = [item.strip() for item in header.split(":", maxsplit=1)][:2]
             headers[attr] = value
         return headers
+    print("file is not exiting")
     return None
 
 
@@ -81,10 +96,15 @@ def update_user_info(
     user_info_file: str = "user_info.json",
     force_update: bool = False,
 ):
-    """_summary_
+    """download a user info object and return a json object
 
     Args:
-        header_file (str, optional): _description_. Defaults to "headers".
+        header_file (str, optional): a user http header file. Defaults to "headers".
+        user_info_file (str, optional): a new or exiting json file to store user info. Defaults to "user_info.json".
+        force_update (bool, optional): force download latest user info from duolingo or not if the user info file was saved beforehand. Defaults to False.
+
+    Returns:
+        dict: a json object representing user info
     """
     headers = process_header_file(header_file)
     user_info = Path(user_info_file)
@@ -119,12 +139,16 @@ def update_vocabulary(
 
 
 if __name__ == "__main__":
-    header_file = "headers"
-    userinfo_file = "user_info.json"
+    file_path_prefix = "../res/"
+
+    header_file = file_path_prefix + "headers"
+
+    userinfo_file = file_path_prefix + "user_info.json"
+    cached_voc_file = file_path_prefix + "voc.json"
+
     path_file = "path.json"
     skills_file = "skills.json"
-    cached_voc_file = "voc.json"
-    update_user_info(header_file,userinfo_file,True)
-    update_vocabulary(header_file,cached_voc_file,True)
-
-
+    # First, download user info
+    update_user_info(header_file, userinfo_file, True)
+    # Second, download vocabulary
+    update_vocabulary(header_file, cached_voc_file, True)

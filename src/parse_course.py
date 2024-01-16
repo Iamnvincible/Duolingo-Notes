@@ -64,21 +64,21 @@ def get_units_legacy(course_path_file: str):
     return units_count
 
 
-def get_units(course_path_file: str = "path.json"):
+def get_units(course_path_file: str = "path.json", paths_dir: str = "units"):
     file = Path(course_path_file)
     units_count = 0
     if file.exists():
         sub_teachingobjectives = []
-        save_dir = Path("units")
+        save_dir = Path(paths_dir)
         if not save_dir.exists():
             save_dir.mkdir()
         with file.open() as f:
             sections = json.load(f)
         for section in sections:
-            for unit in section['units']:
+            for unit in section["units"]:
                 u = {}
                 u["index"] = unit["unitIndex"] + 1
-                u["section"] = section['index'] + 1
+                u["section"] = section["index"] + 1
                 u["guide"] = unit["guidebook"]
                 u["theme"] = unit["teachingObjective"]
                 u["cert"] = unit["cefrLevel"]
@@ -93,7 +93,7 @@ def get_units(course_path_file: str = "path.json"):
                         sub_teachingobjectives.append(
                             level["pathLevelClientData"]["skillId"]
                         )
-                        level['level_index'] = uniq_level_index
+                        level["level_index"] = uniq_level_index
                         u["levels"].append(level)
                     uniq_level_index += 1
                 unit_path = Path(f'unit_{u["index"]}.json')
@@ -104,11 +104,11 @@ def get_units(course_path_file: str = "path.json"):
     return units_count
 
 
-def get_skills(skills_file: str = "skills.json"):
+def get_skills(skills_file: str = "skills.json", skills_dir: str = "skills"):
     file = Path(skills_file)
     skills_count = 0
     if file.exists():
-        save_dir = Path("skills")
+        save_dir = Path(skills_dir)
         if not save_dir.exists():
             save_dir.mkdir()
         with file.open(encoding="utf-8") as f:
@@ -123,18 +123,23 @@ def get_skills(skills_file: str = "skills.json"):
                 skills_count += 1
     return skills_count
 
-def unit_path(path_file:str):
+
+def unit_path(path_file: str, save_dir: str = "unit_path"):
     path = Path(path_file)
+    save = Path(save_dir)
     if path.exists():
-        with path.open('r',encoding="utf-8") as f:
+        if not save.exists():
+            save.mkdir()
+        with path.open("r", encoding="utf-8") as f:
             path_json = json.load(f)
         for section in path_json:
-            for unit in section['units']:
-                unit_index = unit['unitIndex'] + 1
-                save_name = f'unit-{unit_index}-path.json'
-                save_file = Path(save_name)
-                with save_file.open('w',encoding='utf-8') as f:
-                    json.dump(unit,f,indent=4,ensure_ascii=False)
+            for unit in section["units"]:
+                unit_index = unit["unitIndex"] + 1
+                save_name = f"unit-{unit_index}-path.json"
+                save_file = Path(save_dir, save_name)
+                with save_file.open("w", encoding="utf-8") as f:
+                    json.dump(unit, f, indent=4, ensure_ascii=False)
+
 
 if __name__ == "__main__":
     userinfo_file = "user_info.json"
@@ -146,4 +151,4 @@ if __name__ == "__main__":
         dump_current_skills(userinfo_file, skills_file)
     get_units(path_file)
     get_skills()
-    unit_path(path_file)
+    # unit_path(path_file)

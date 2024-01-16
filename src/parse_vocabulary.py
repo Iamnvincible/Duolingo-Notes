@@ -35,7 +35,7 @@ def organize_words_by_pos(wordlist: list):
             if pos not in word_catalog.keys():
                 word_catalog[pos] = []
             key = pos
-        elif pos == None:
+        elif pos is None:
             if other_key not in word_catalog.keys():
                 word_catalog[other_key] = []
             key = other_key
@@ -52,7 +52,7 @@ def dump_wordlist_by_skill(skill_name: str, skill_word: dict, path: str):
     """
     skill_file = Path(path, f"{skill_name}.json")
     with skill_file.open("w", encoding="utf-8") as file:
-        json.dump(skill_word, file, indent=4)
+        json.dump(skill_word, file, indent=4, ensure_ascii=False)
 
 
 def split_word_by_skill(vocab_overview: list):
@@ -83,7 +83,7 @@ def get_unit_info(index: int, unit_path: Path, skill_path: Path, skill_voc_path:
             skill_name = "DiningOut"
         for skill_one_file in skill_path.iterdir():
             if skill_one_file.name.endswith(f"{skill_name}.json"):
-                skill_file = Path(skill_path,skill_one_file.name)
+                skill_file = Path(skill_path, skill_one_file.name)
         word_file = Path(skill_voc_path, f"{skill_name}.json")
         skill_info = {}
         if not skill_file.exists():
@@ -101,21 +101,34 @@ def get_unit_info(index: int, unit_path: Path, skill_path: Path, skill_voc_path:
     return {"unit": unit, "skill": skills}
 
 
-def show_unit(index: int):
+def show_unit(
+    index: int,
+    units_dir: str = "units",
+    skills_dir: str = "skills",
+    skill_voc_dir: str = "skill_voc",
+):
     """
     获得一个 unit 的单词表，返回 md 格式字符串列表
     """
     # genders = {"Masculine": "der", "Feminine": "die", "Neuter": "das"}
-    units_dir = "units"
-    skills_dir = "skills"
-    skill_voc_dir = "skill_voc"
+    # units_dir = "units"
+    # skills_dir = "skills"
+    # skill_voc_dir = "skill_voc"
     udir = Path(units_dir)
     sdir = Path(skills_dir)
     vdir = Path(skill_voc_dir)
     string_lines = []
     u = get_unit_info(index, udir, sdir, vdir)
     # print("## %s"%(u['unit']['theme']))
-    string_lines.append("## S%d-%d-%s %s" % (u["unit"]["section"],index,u["unit"]["cert"],u["unit"]["theme"].capitalize()))
+    string_lines.append(
+        "## S%d-%d-%s %s"
+        % (
+            u["unit"]["section"],
+            index,
+            u["unit"]["cert"],
+            u["unit"]["theme"].capitalize(),
+        )
+    )
     for level in u["skill"]:
         # print("### %s"%(level['info']['urlName']))
         string_lines.append("### %s" % (level["info"]["urlName"]))
@@ -148,7 +161,14 @@ def show_unit(index: int):
     return string_lines
 
 
-def write_unit_wordlist(path: Path, start: int, end: int):
+def write_unit_wordlist(
+    path: Path,
+    units_dir: str,
+    skills_dir: str,
+    skill_voc_dir: str,
+    start: int,
+    end: int,
+):
     """
     将一个范围内 unit 的单词表导出到 md 文件
     """
@@ -156,7 +176,7 @@ def write_unit_wordlist(path: Path, start: int, end: int):
         path.mkdir()
     for i in range(start, end + 1):
         # print(i)
-        lines = show_unit(i)
+        lines = show_unit(i, units_dir, skills_dir, skill_voc_dir)
         file_name = Path(path, f"unit_{i}.md")
         with file_name.open("w", encoding="utf-8") as file:
             file.writelines([line + "\n" for line in lines])
@@ -178,7 +198,7 @@ def write_tips_notes(notes: Path, skills: Path):
 def dump_words_of_skills(
     req_headers: str, skillvoc_dir: Path, voc_file: str = None, update=False
 ):
-    from req_source import update_vocabulary
+    from update_study_process import update_vocabulary
 
     vocab_overview = update_vocabulary(req_headers, voc_file, update)
     if not vocab_overview:
@@ -200,7 +220,7 @@ if __name__ == "__main__":
     notes_dir = Path("tips_and_notes")
     # if not skillvoc_dir.exists() or not any(skillvoc_dir.iterdir()):
     dump_words_of_skills("headers", skillvoc_dir, "voc.json", False)
-    write_unit_wordlist(voc_list_dir, 1, 27)
+    write_unit_wordlist(voc_list_dir, 1, 33)
     if skills_dir.exists():
         if not notes_dir.exists():
             notes_dir.mkdir()
