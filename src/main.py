@@ -56,15 +56,17 @@ def extract_path_skill_unit():
         print("user_info.json doesn't exist")
 
 
-def extract_words_of_skill():
+def extract_words_of_skill(unit_word_list: bool, start: int, end: int):
     skill_voc = Path(skills_voc_dir)
     # skills_dir_path = Path(skills_dir)
     voc_list_dir = Path(units_voc_dir)
     # notes_dir = Path("tips_and_notes")
     # if not skillvoc_dir.exists() or not any(skillvoc_dir.iterdir()):
     dump_words_of_skills(header_file, skill_voc, cached_voc_file, False)
-    write_unit_wordlist(voc_list_dir, units_dir, skills_dir, skills_voc_dir, 1, 34)
-
+    if unit_word_list and start <= end and start >= 1:
+        write_unit_wordlist(
+            voc_list_dir, units_dir, skills_dir, skills_voc_dir, start, end
+        )
 
 def condense_voc_by_pos():
     skill_voc = Path(skills_voc_dir)
@@ -96,12 +98,14 @@ def export_csv(start: int = 1, end: int = 1):
 
 
 if __name__ == "__main__":
+    start_index = 37
+    end_index = 37
     # 1. download infomation from Duolingo
     update_info()
     # 2. extract courses structure from downloaded infomation
     extract_path_skill_unit()
     # 3. split vocabulary into skills
-    extract_words_of_skill()
+    extract_words_of_skill(True, start_index, end_index)
     # 4. optional, remove personal learning progres from vocabulary
     condense_voc_by_pos()
     # 5. dump all words to db
