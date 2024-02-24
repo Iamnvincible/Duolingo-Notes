@@ -65,11 +65,13 @@ def combine(voc: dict, prac: list, db_file: str = "data.db"):
                     if regular_word not in items.keys():
                         items[regular_word] = {}
                         items[regular_word]["example"] = []
-                        variant = ""
+                        variant = None
                         if key == "Noun":
                             variant = fulfill_noun(word_dict, db_file)
                         elif key == "Verb":
                             variant = fulfill_verb(word_dict, db_file)
+                        if not variant:
+                            variant = "Translation"
                         items[regular_word]["variant"] = variant
                     # print(regular_word)
                     items[regular_word]["example"].append(

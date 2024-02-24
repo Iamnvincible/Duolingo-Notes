@@ -98,8 +98,8 @@ def export_csv(start: int = 1, end: int = 1):
 
 
 if __name__ == "__main__":
-    start_index = 37
-    end_index = 37
+    start_index = 1
+    end_index = 1
     # 1. download infomation from Duolingo
     update_info()
     # 2. extract courses structure from downloaded infomation
@@ -111,6 +111,6 @@ if __name__ == "__main__":
     # 5. dump all words to db
     dump_to_db(cached_voc_file, voc_database_file)
     # 6. download practice of target unit range
-    download_practice(33, 34)
+    download_practice(start_index, end_index)
     # 7. export practice to reword app csv
-    export_csv(33, 34)
+    export_csv(start_index, end_index)
