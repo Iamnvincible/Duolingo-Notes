@@ -27,7 +27,7 @@ def read_practice(practice_file: Path):
 def read_type(practice: list):
     keep_practice = []
     for item in practice:
-        if item["type"] not in ["assist", "match", "select"]:
+        if item["type"] not in ["assist", "match", "select", "name"]:
             # if 'prompt' in item and item['type'] != 'assist':
             print(item["type"])
             exercise = {}
